@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+.overline {
+  text-decoration: overline;
+  text-decoration-thickness: 2px;
+}

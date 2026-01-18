@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/converter.tsx","./src/components/quiz.tsx","./src/components/reference.tsx","./src/components/romandisplay.tsx","./src/utils/romannumerals.test.ts","./src/utils/romannumerals.ts"],"version":"5.9.3"}
