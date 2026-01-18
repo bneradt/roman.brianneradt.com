@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import {
   toRomanString,
   fromRoman,
@@ -33,6 +33,16 @@ export function Quiz() {
     score: { correct: 0, total: 0 },
   }))
 
+  const nextButtonRef = useRef<HTMLButtonElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Focus Next button when answer is checked
+  useEffect(() => {
+    if (state.isAnswered) {
+      nextButtonRef.current?.focus()
+    }
+  }, [state.isAnswered])
+
   const generateNewQuestion = useCallback(() => {
     const range = DIFFICULTY_RANGES[difficulty]
     setState((prev) => ({
@@ -42,6 +52,11 @@ export function Quiz() {
       isAnswered: false,
       isCorrect: false,
     }))
+    // Focus and select input after generating new question
+    setTimeout(() => {
+      inputRef.current?.focus()
+      inputRef.current?.select()
+    }, 0)
   }, [difficulty])
 
   const handleDifficultyChange = (newDifficulty: Difficulty) => {
@@ -185,6 +200,7 @@ export function Quiz() {
       {/* Answer Input */}
       <div className="space-y-3">
         <input
+          ref={inputRef}
           type="text"
           value={state.userAnswer}
           onChange={(e) =>
@@ -240,6 +256,7 @@ export function Quiz() {
             </button>
           ) : (
             <button
+              ref={nextButtonRef}
               onClick={generateNewQuestion}
               className="rounded-lg bg-blue-600 px-6 py-2.5 font-medium text-white transition-colors hover:bg-blue-700"
             >
