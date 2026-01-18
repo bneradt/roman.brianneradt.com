@@ -33,15 +33,13 @@ export function Quiz() {
     score: { correct: 0, total: 0 },
   }))
 
-  const nextButtonRef = useRef<HTMLButtonElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Focus Next button when answer is checked
+  // Focus and select input on mount and when question changes
   useEffect(() => {
-    if (state.isAnswered) {
-      nextButtonRef.current?.focus()
-    }
-  }, [state.isAnswered])
+    inputRef.current?.focus()
+    inputRef.current?.select()
+  }, [state.currentNumber])
 
   const generateNewQuestion = useCallback(() => {
     const range = DIFFICULTY_RANGES[difficulty]
@@ -52,11 +50,7 @@ export function Quiz() {
       isAnswered: false,
       isCorrect: false,
     }))
-    // Focus and select input after generating new question
-    setTimeout(() => {
-      inputRef.current?.focus()
-      inputRef.current?.select()
-    }, 0)
+    // Focus is handled by useEffect on currentNumber change
   }, [difficulty])
 
   const handleDifficultyChange = (newDifficulty: Difficulty) => {
@@ -203,17 +197,25 @@ export function Quiz() {
           ref={inputRef}
           type="text"
           value={state.userAnswer}
-          onChange={(e) =>
-            setState((prev) => ({ ...prev, userAnswer: e.target.value }))
-          }
+          onChange={(e) => {
+            // Only allow changes when not yet answered
+            if (!state.isAnswered) {
+              setState((prev) => ({ ...prev, userAnswer: e.target.value }))
+            }
+          }}
           onKeyDown={handleKeyDown}
           placeholder={
-            direction === 'arabicToRoman'
-              ? 'Enter Roman numeral...'
-              : 'Enter number...'
+            state.isAnswered
+              ? 'Press Enter to continue...'
+              : direction === 'arabicToRoman'
+                ? 'Enter Roman numeral...'
+                : 'Enter number...'
           }
-          disabled={state.isAnswered}
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 text-lg focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100"
+          className={`w-full rounded-lg border px-4 py-3 text-lg focus:outline-none focus:ring-1 ${
+            state.isAnswered
+              ? 'border-gray-200 bg-gray-50 text-gray-500 focus:border-gray-300 focus:ring-gray-300'
+              : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+          }`}
           autoFocus
         />
 
@@ -256,7 +258,6 @@ export function Quiz() {
             </button>
           ) : (
             <button
-              ref={nextButtonRef}
               onClick={generateNewQuestion}
               className="rounded-lg bg-blue-600 px-6 py-2.5 font-medium text-white transition-colors hover:bg-blue-700"
             >
